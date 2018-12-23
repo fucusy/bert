@@ -1,0 +1,12 @@
+python run_pretraining.py \
+  --input_file=/tmp/tf_examples_train_movie.tfrecord \
+  --output_dir=/tmp/movie_pretraining_output \
+  --do_train=True \
+  --do_eval=True \
+  --bert_config_file=./uncased_L-12_H-768_A-12/bert_config.json \
+  --train_batch_size=8\
+  --max_seq_length=128 \
+  --max_predictions_per_seq=20 \
+  --num_train_steps=2 \
+  --num_warmup_steps=10 \
+  --learning_rate=2e-5
