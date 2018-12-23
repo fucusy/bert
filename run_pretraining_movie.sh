@@ -1,3 +1,4 @@
+rm -rf /tmp/movie_pretraining_output
 python run_pretraining.py \
   --input_file=/tmp/tf_examples_train_movie.tfrecord \
   --test_file=/tmp/tf_examples_test_movie.tfrecord \
