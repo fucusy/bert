@@ -38,6 +38,10 @@ flags.DEFINE_string(
     "Input TF example files (can be a glob or comma separated).")
 
 flags.DEFINE_string(
+    "test_file", None,
+    "test TF example files (can be a glob or comma separated).")
+
+flags.DEFINE_string(
     "output_dir", None,
     "The output directory where the model checkpoints will be written.")
 
@@ -417,8 +421,16 @@ def main(_):
   for input_pattern in FLAGS.input_file.split(","):
     input_files.extend(tf.gfile.Glob(input_pattern))
 
+  test_files = []
+  for input_pattern in FLAGS.test_file.split(","):
+    test_files.extend(tf.gfile.Glob(input_pattern))
+
   tf.logging.info("*** Input Files ***")
   for input_file in input_files:
+    tf.logging.info("  %s" % input_file)
+
+  tf.logging.info("*** Test Files ***")
+  for input_file in test_files:
     tf.logging.info("  %s" % input_file)
 
   tpu_cluster_resolver = None
@@ -481,6 +493,26 @@ def main(_):
     output_eval_file = os.path.join(FLAGS.output_dir, "eval_results.txt")
     with tf.gfile.GFile(output_eval_file, "w") as writer:
       tf.logging.info("***** Eval results *****")
+      for key in sorted(result.keys()):
+        tf.logging.info("  %s = %s", key, str(result[key]))
+        writer.write("%s = %s\n" % (key, str(result[key])))
+
+  if FLAGS.test_file:
+    tf.logging.info("***** Running testing *****")
+    tf.logging.info("  Batch size = %d", FLAGS.eval_batch_size)
+
+    test_input_fn = input_fn_builder(
+        input_files=test_files,
+        max_seq_length=FLAGS.max_seq_length,
+        max_predictions_per_seq=FLAGS.max_predictions_per_seq,
+        is_training=False)
+
+    result = estimator.evaluate(
+        input_fn=test_input_fn, steps=FLAGS.max_eval_steps)
+
+    output_test_file = os.path.join(FLAGS.output_dir, "test_results.txt")
+    with tf.gfile.GFile(output_test_file, "w") as writer:
+      tf.logging.info("***** Test results *****")
       for key in sorted(result.keys()):
         tf.logging.info("  %s = %s", key, str(result[key]))
         writer.write("%s = %s\n" % (key, str(result[key])))

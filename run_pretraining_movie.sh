@@ -1,5 +1,6 @@
 python run_pretraining.py \
   --input_file=/tmp/tf_examples_train_movie.tfrecord \
+  --test_file=/tmp/tf_examples_test_movie.tfrecord \
   --output_dir=/tmp/movie_pretraining_output \
   --do_train=True \
   --do_eval=True \
